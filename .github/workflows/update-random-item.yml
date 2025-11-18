@@ -2,10 +2,8 @@ name: Update random feed item
 
 on:
   schedule:
-    # Каждые 6 часов
-    - cron: "0 */6 * * *"
-  # Возможность запустить руками
-  workflow_dispatch:
+    - cron: "0 */6 * * *"   # запуск каждые 6 часов
+  workflow_dispatch:         # ручной запуск
 
 permissions:
   contents: write
@@ -28,11 +26,8 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add random_item.json
-            git commit -m "Update random random_item.json [skip ci]" || echo "No changes to commit"
-            git push
-          else
-            echo "No change
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add random_item.json || echo "Nothing to add"
+          git commit -m "Update random_item.json [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
