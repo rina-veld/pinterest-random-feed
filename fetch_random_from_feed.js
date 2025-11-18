@@ -24,22 +24,24 @@ async function main() {
     throw new Error("Не нашла ни одного <item> в фиде");
   }
 
-  // Выбираем случайный <item>
+  // Выбираем случайный item
   const randomIndex = Math.floor(Math.random() * items.length);
   const randomItem = items[randomIndex];
 
+  // Функция для вытаскивания значений из тегов
   function extractTag(tag) {
     const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
     const m = randomItem.match(re);
     return m ? m[1].trim() : null;
   }
 
-  const link = extractTag("link");
+  // Shopify Superfeed использует <product_url> вместо <link>
+  const link = extractTag("product_url");
   const title = extractTag("title");
   const description = extractTag("description");
 
   if (!link) {
-    throw new Error("У случайного item нет <link>, странно 🤔");
+    throw new Error("У случайного item нет <product_url>");
   }
 
   const payload = {
@@ -50,6 +52,7 @@ async function main() {
   };
 
   fs.writeFileSync("random_item.json", JSON.stringify(payload, null, 2), "utf-8");
+
   console.log("Saved random_item.json:", payload);
 }
 
