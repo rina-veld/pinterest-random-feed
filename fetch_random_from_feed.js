@@ -12,6 +12,7 @@ async function main() {
 
   const xml = await response.text();
 
+  // Ищем все <item>...</item>
   const items = [];
   const itemRegex = /<item\b[^>]*>[\s\S]*?<\/item>/g;
   let match;
@@ -23,21 +24,7 @@ async function main() {
     throw new Error("Не нашла ни одного <item> в фиде");
   }
 
+  // Вытаскиваем текст внутри тега
   function extractTag(item, tag) {
     const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
-    const m = item.match(re);
-    if (!m) return null;
-
-    // убираем <![CDATA[...]]>
-    return m[1]
-      .trim()
-      .replace(/^<!\[CDATA\[/, "")
-      .replace(/\]\]>$/, "")
-      .trim();
-  }
-
-  let randomItem = null;
-  let link = null;
-  let image = null;
-  let title = null;
-  let description
+    const m =
