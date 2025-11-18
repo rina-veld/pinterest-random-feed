@@ -1,0 +1,38 @@
+name: Update random feed item
+
+on:
+  schedule:
+    # Каждые 6 часов
+    - cron: "0 */6 * * *"
+  # Возможность запустить руками
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-random-item:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run script to fetch random item
+        run: node fetch_random_from_feed.js
+
+      - name: Commit and push changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add random_item.json
+            git commit -m "Update random random_item.json [skip ci]" || echo "No changes to commit"
+            git push
+          else
+            echo "No change
