@@ -40,33 +40,48 @@ async function main() {
       .trim();
   }
 
+  // Убираем переносы и обрезаем текст под Pinterest (480 символов)
+  function cleanAndTruncateDesc(value) {
+    if (!value) return null;
+
+    // заменяем переносы на пробелы
+    let v = value.replace(/\r?\n|\r/g, " ");
+
+    // удаляем двойные/тройные пробелы
+    v = v.replace(/\s+/g, " ").trim();
+
+    // ограничиваем до 480 символов
+    if (v.length > 480) {
+      return v.slice(0, 479).trim() + "…";
+    }
+
+    return v;
+  }
+
   let randomItem = null;
+
   let link = null;
   let image = null;
   let title = null;
   let description = null;
 
   // Несколько попыток найти товар с нормальной ссылкой
-  for (let attempt = 0; attempt < 20; attempt++) {
+  for (let attempt = 0; attempt < 30; attempt++) {
     const randomIndex = Math.floor(Math.random() * items.length);
     randomItem = items[randomIndex];
 
-    // URL товара
     link =
       extractTag(randomItem, "g:link") ||
       extractTag(randomItem, "link");
 
-    // Картинка товара
     image =
       extractTag(randomItem, "g:image_link") ||
       extractTag(randomItem, "image_link");
 
-    // Заголовок
     title =
       extractTag(randomItem, "title") ||
       extractTag(randomItem, "g:title");
 
-    // Описание
     description =
       extractTag(randomItem, "description") ||
       extractTag(randomItem, "g:description");
@@ -78,12 +93,18 @@ async function main() {
     throw new Error("Не удалось найти ни одного item с тегом <g:link> или <link>");
   }
 
+  // Чистим данные
+  const cleanLink = cleanValue(link);
+  const cleanImage = cleanValue(image);
+  const cleanTitle = cleanValue(title);
+  const cleanDesc = cleanAndTruncateDesc(cleanValue(description));
+
   const payload = {
     generated_at: new Date().toISOString(),
-    link: cleanValue(link),
-    image: cleanValue(image),
-    title: cleanValue(title),
-    description: cleanValue(description),
+    link: cleanLink,
+    image: cleanImage,
+    title: cleanTitle,
+    description: cleanDesc
   };
 
   fs.writeFileSync("random_item.json", JSON.stringify(payload, null, 2), "utf-8");
