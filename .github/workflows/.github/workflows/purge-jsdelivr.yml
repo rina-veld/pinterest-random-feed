@@ -2,8 +2,8 @@ name: Purge jsDelivr cache
 
 on:
   schedule:
-    - cron: "0 */5 * * *"   # каждые 5 часов
-  workflow_dispatch:       # запуск вручную
+    - cron: "0 */5 * * *"   # запуск каждые 5 часов
+  workflow_dispatch:        # возможность ручного запуска
 
 jobs:
   purge:
