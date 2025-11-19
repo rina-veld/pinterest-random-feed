@@ -1,0 +1,15 @@
+name: Purge jsDelivr cache
+
+on:
+  schedule:
+    - cron: "0 */5 * * *"   # каждые 5 часов
+  workflow_dispatch:       # запуск вручную
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge jsDelivr cache
+        run: |
+          curl -I "https://purge.jsdelivr.net/gh/rina-veld/pinterest-random-feed@main/random_item.json"
