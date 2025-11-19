@@ -2,14 +2,28 @@ name: Purge jsDelivr cache
 
 on:
   schedule:
-    - cron: "0 */5 * * *"   # запуск каждые 5 часов
-  workflow_dispatch:
+    - cron: "0 */5 * * *"   # каждые 5 часов по UTC
+  workflow_dispatch:        # возможность запустить руками
 
 jobs:
   purge:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Curl purge request
+      - name: Purge random_item.json on jsDelivr (twice for safety)
         run: |
-          curl -X GET "https://purge.jsdelivr.net/gh/rina-veld/pinterest-random-feed@main/random_item.json"
+          set -euo pipefail
+          FILE_PATH="rina-veld/pinterest-random-feed@main/random_item.json"
+          PURGE_URL="https://purge.jsdelivr.net/gh/${FILE_PATH}"
+          # дергаем purge два раза, чтобы обновились оба провайдера
+          curl -fsSL -X GET "$PURGE_URL"
+          sleep 5
+          curl -fsSL -X GET "$PURGE_URL"
+      
+      - name: Warm CDN with fresh query param
+        run: |
+          TS=$(date +%s)
+          WARM_URL="https://cdn.jsdelivr.net/gh/rina-veld/pinterest-random-feed@main/random_item.json?t=${TS}"
+          # делаем HEAD и потом GET чтобы прогреть кэш сразу на нескольких POP-ах
+          curl -fsSI "$WARM_URL" > /dev/null
+          curl -fsSL "$WARM_URL"  > /dev/null
