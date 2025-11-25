@@ -2,7 +2,7 @@ name: Update random feed item
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # запуск каждые 6 часов
+    - cron: "0 */4 * * *"   # запуск каждые 6 часов
   workflow_dispatch:         # ручной запуск
 
 permissions:
